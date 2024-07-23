@@ -74,6 +74,10 @@ def build():
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--mode", choices=["generate", "build"], required=True)
+    parser.add_argument("--path", required=False)
     args = parser.parse_args()
     if args.mode == "generate": generate()
     else: build()
+
+if __name__ == "__main__":
+    main()
