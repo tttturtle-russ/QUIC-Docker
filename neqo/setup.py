@@ -1,5 +1,10 @@
-from rich import print
+import os   
+import argparse
 import subprocess
+import docker
+from rich import print
+
+client = docker.from_env()
 
 def list_all_tags_for_remote_git_repo(url):
     """
@@ -48,9 +53,27 @@ RUN cargo build
 EXPOSE 12345
 CMD [ "/neqo/target/debug/neqo-server", "[::]:12345" ]
 """
-tags = list_all_tags_for_remote_git_repo(repo_url)
-for tag in tags:
-    with open(f"./Dockerfile.{tag}", "w") as f:
-        f.write(template.format(tag=tag))
 
-print(f"Generate [green]{len(tags)}[/green] Dockerfile for mozilla/neqo")
+def generate():
+    tags = list_all_tags_for_remote_git_repo(repo_url)
+    for tag in tags:
+        with open(f"./Dockerfile.{tag}", "w") as f:
+            f.write(template.format(tag=tag))
+    print(f"Generate [green]{len(tags)}[/green] Dockerfile for mozilla/neqo")
+
+def build():
+    cnt = 0
+    for dockerfile in os.listdir(os.getcwd()):
+        if not dockerfile.startswith("Dockerfile"):
+            continue
+        tag = f"neqo:{dockerfile.split(".")[1]}"
+        client.images.build(dockerfile=dockerfile, tag=tag, quiet=False)
+        cnt += 1
+    print(f"Build [green]{cnt}[/green] images")
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--mode", choices=["generate", "build"], required=True)
+    args = parser.parse_args()
+    if args.mode == "generate": generate()
+    else: build()
