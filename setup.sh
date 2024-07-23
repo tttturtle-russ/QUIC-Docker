@@ -11,14 +11,16 @@ for d in ./*; do
         echo "Find no build.py for ${d}"
         continue
     fi;
+    pushd "${d}" > /dev/null || exit
     # Generate Dockerfile if needed
-    if grep -q generate "${d}"/.stages; then
+    if grep -q generate .stages; then
         echo "Generating ${d}"
         python setup.py --mode=generate
     fi;
     # Build docker image
-    if grep -q build "${d}"/.stages; then
+    if grep -q build .stages; then
         echo "Building ${d}"
         python setup.py --mode=build --path=/tmp/"${d}"
     fi;
+    popd > /dev/null || exit
 done;
