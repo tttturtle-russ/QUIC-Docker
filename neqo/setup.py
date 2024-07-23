@@ -66,8 +66,8 @@ def build():
     for dockerfile in os.listdir(os.getcwd()):
         if not dockerfile.startswith("Dockerfile"):
             continue
-        print(f"dockerfile: {dockerfile}")
-        tag = f"neqo:{dockerfile.split(".")[1]}"
+        print(f"Building: [red]{dockerfile}[/red]")
+        tag = f"neqo:{dockerfile.split("v")[1]}"
         client.images.build(path=os.getcwd(),dockerfile=dockerfile, tag=tag, quiet=False)
         cnt += 1
     print(f"Build [green]{cnt}[/green] images")
