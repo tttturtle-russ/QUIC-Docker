@@ -20,5 +20,5 @@ RUN ./build.sh --static -Ddisable_tests=1
 WORKDIR /neqo
 RUN cargo build -v --all-targets --tests --release
 
-EXPOSE 4433
+EXPOSE 4433/udp
 CMD [ "/neqo/target/release/neqo-server", "[::]:4433", "--db", "/neqo/test-fixture/db", "--qlog-dir","/qlog" ]
