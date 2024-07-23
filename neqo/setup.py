@@ -43,7 +43,7 @@ RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
 ENV PATH=$PATH:/root/.cargo/bin/
 RUN git clone https://github.com/mozilla/neqo.git
 WORKDIR /neqo
-git checkout {tag}
+RUN git checkout {tag}
 RUN git clone https://github.com/nss-dev/nss.git
 RUN hg clone https://hg.mozilla.org/projects/nspr
 WORKDIR /neqo/nss
@@ -72,6 +72,7 @@ def build():
             continue
         print(f"Building: [red]{dockerfile}[/red]")
         tag = f"neqo:{dockerfile.split("v")[1]}"
+        print(tag)
         client.images.build(path=os.getcwd(),dockerfile=dockerfile, tag=tag, quiet=False)
         cnt += 1
     print(f"Build [green]{cnt}[/green] images")
