@@ -9,7 +9,7 @@ def build_docker(path:str, tag: str):
 
 
 def build(path: str):
-    git.Repo.clone_from(url="https://github.com/litespeedtech/lsquic.git", path=path)
+    git.Repo.clone_from(url="https://github.com/litespeedtech/lsquic.git", to_path=path)
     repo = git.Repo(path=path)
     for tag in repo.tags:
         repo.git.checkout(tag)
