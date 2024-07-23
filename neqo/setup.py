@@ -30,7 +30,7 @@ def list_all_tags_for_remote_git_repo(url):
 
 repo_url = "https://github.com/mozilla/neqo.git"
 
-template = """
+template = r"""
 FROM ubuntu:20.04
 
 # RUN sed -i.bak 's|https\?://archive.ubuntu.com|https://mirrors.aliyun.com|g' /etc/apt/sources.list
