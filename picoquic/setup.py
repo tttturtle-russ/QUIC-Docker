@@ -16,6 +16,7 @@ def build(path: str):
         repo.git.checkout(tag)
         for submodule in repo.submodules:
             submodule.update(init=True)
+        print(f"Building: picoquic:{tag}")
         build_docker(path, f"picoquic:{tag}")
     print(f"Build [green]{len(repo.tags)}[/green] images")
 

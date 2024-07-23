@@ -15,6 +15,7 @@ def build(path: str):
         repo.git.checkout(tag)
         for submodule in repo.submodules:
             submodule.update(init=True)
+        print(f"Building: lsquic:{tag}")
         build_docker(path, f"lsquic:{tag}")
     print(f"Build [green]{len(repo.tags)}[/green] images")
 
