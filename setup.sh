@@ -12,12 +12,12 @@ for d in ./*; do
         continue
     fi;
     # Generate Dockerfile if needed
-    if grep -q generate .stages; then
+    if grep -q generate "${d}"/.stages; then
         echo "Generating ${d}"
         python setup.py --mode=generate
     fi;
     # Build docker image
-    if grep -q build .stages; then
+    if grep -q build "${d}"/.stages; then
         echo "Building ${d}"
         python setup.py --mode=build --path=/tmp/"${d}"
     fi;
