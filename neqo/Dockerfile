@@ -5,11 +5,20 @@ RUN apt update && apt upgrade -y
 RUN apt-get install -y --no-install-recommends \
             ca-certificates coreutils curl git make mercurial ssh \
             build-essential clang llvm libclang-dev gyp ninja-build \
-            pkg-config zlib1g-dev
+            pkg-config zlib1g-dev python3
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y 
 ENV PATH=$PATH:/root/.cargo/bin/
 RUN git clone https://github.com/mozilla/neqo.git
+
+
+
+
+
 WORKDIR /neqo
+
+COPY ./modify_script.py /neqo
+RUN python3 /neqo/modify_script.py
+
 RUN git clone https://github.com/nss-dev/nss.git
 RUN hg clone https://hg.mozilla.org/projects/nspr
 WORKDIR /neqo/nss
@@ -21,4 +30,5 @@ WORKDIR /neqo
 RUN cargo build -v --all-targets --tests --release
 
 EXPOSE 4433/udp
-CMD [ "/neqo/target/release/neqo-server", "[::]:4433", "--db", "/neqo/test-fixture/db", "--qlog-dir","/qlog" ]
+# CMD [ "/neqo/target/release/neqo-server", "[::]:4433", "--db", "/neqo/test-fixture/db", "--qlog-dir","/qlog" ]
+
