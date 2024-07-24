@@ -9,16 +9,9 @@ RUN apt-get install -y --no-install-recommends \
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y 
 ENV PATH=$PATH:/root/.cargo/bin/
 RUN git clone https://github.com/mozilla/neqo.git
-
-
-
-
-
 WORKDIR /neqo
-
 COPY ./modify_script.py /neqo
 RUN python3 /neqo/modify_script.py
-
 RUN git clone https://github.com/nss-dev/nss.git
 RUN hg clone https://hg.mozilla.org/projects/nspr
 WORKDIR /neqo/nss
