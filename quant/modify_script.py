@@ -90,3 +90,21 @@ des_content='''
 '''
 
 replace_content('/src/lib/src/conn.c', pre_content=pre_content, des_content=des_content)
+
+pre_content='''
+        if (c == 0) {
+            if (have_active == false && timeout)
+                break;
+            continue;
+        }
+'''
+
+des_content='''
+        if (c == 0) {
+            if (have_active == false && timeout)
+                continue;
+            continue;
+        }
+'''
+
+replace_content('/src/bin/server.c', pre_content=pre_content, des_content=des_content)
