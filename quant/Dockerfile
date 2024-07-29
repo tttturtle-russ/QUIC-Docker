@@ -21,13 +21,15 @@ RUN git config --global user.email "docker@example.com"
 # 克隆 NTAP/quant 仓库
 RUN git clone --recursive https://github.com/NTAP/quant.git /src
 
-# 打补丁
-COPY ./modify_script.py /src
+RUN git checkout 27
 
-COPY ./server.c /src/bin/
+# 打补丁
+# COPY ./modify_script.py /src
+
+# COPY ./server.c /src/bin/
 
 # 修改 conn.c 中的代码
-RUN python3 /src/modify_script.py
+# RUN python3 /src/modify_script.py
 
 # 切换工作目录
 WORKDIR /src/Debug
