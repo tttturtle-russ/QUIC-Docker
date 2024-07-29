@@ -22,12 +22,10 @@ RUN git config --global user.email "docker@example.com"
 RUN git clone --recursive https://github.com/NTAP/quant.git /src
 
 # 打补丁
-COPY ./modify_script.py /src
-
-COPY ./server.c /src/bin/
-
+COPY ./recovery.c /src/lib/src/recovery.c
+ 
 # 修改 conn.c 中的代码
-RUN python3 /src/modify_script.py
+# RUN python3 /src/modify_script.py
 
 # 切换工作目录
 WORKDIR /src/Debug
@@ -57,4 +55,4 @@ CMD ["tail", "-f", "/dev/null"]
 
 # 设置默认命令（如果需要）
 # CMD ["/bin/server", "-i", "eth0", "-d", "/tmp", \
-#         "-c", "/tls/dummy.crt", "-k", "/tls/dummy.key"]
+#         "-c", "/tls/server.crt", "-k", "/tls/server.key"]
