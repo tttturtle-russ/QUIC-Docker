@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # 定义分支列表
-branches="27 28 29 32 33 main"
+branches="main"
 
 # 确保 Docker 网络存在
 docker network create quic || true

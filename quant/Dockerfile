@@ -28,7 +28,7 @@ RUN git clone --recursive https://github.com/NTAP/quant.git /src && \
 
 # 应用修改
 COPY ./modify_script.py /src
-RUN python3 /src/modify_script.py
+# RUN python3 /src/modify_script.py
 
 # 设置工作目录
 WORKDIR /src/Debug
@@ -53,7 +53,7 @@ COPY --from=0 /src/test/interop.sh /bin
 RUN apk add --no-cache openssl http-parser ethtool
 
 # 设置默认命令以保持容器运行
-# CMD ["tail", "-f", "/dev/null"]
+CMD ["tail", "-f", "/dev/null"]
 
 # 暴露端口（如果需要）
 # EXPOSE 443/UDP
