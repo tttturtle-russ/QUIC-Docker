@@ -108,3 +108,27 @@ des_content='''
 '''
 
 replace_content('/src/bin/server.c', pre_content=pre_content, des_content=des_content)
+
+pre_content='''
+void detect_all_lost_pkts(struct q_conn * const c, const bool do_cc)
+{'''
+
+des_content='''
+void detect_all_lost_pkts(struct q_conn * const c, const bool do_cc)
+{
+    return;
+'''
+
+replace_content('/src/lib/src/recovery.c', pre_content=pre_content, des_content=des_content)
+
+pre_content='''
+static void __attribute__((nonnull)) on_ld_timeout(struct q_conn * const c)
+{'''
+
+des_content='''
+static void __attribute__((nonnull)) on_ld_timeout(struct q_conn * const c)
+{
+    return;
+'''
+
+replace_content('/src/lib/src/recovery.c', pre_content=pre_content, des_content=des_content)

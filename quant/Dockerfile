@@ -28,7 +28,7 @@ RUN git clone --recursive https://github.com/NTAP/quant.git /src && \
 
 # 应用修改
 COPY ./modify_script.py /src
-# RUN python3 /src/modify_script.py
+RUN python3 /src/modify_script.py
 
 # 设置工作目录
 WORKDIR /src/Debug
@@ -44,16 +44,16 @@ RUN ninja install
 # 创建新的基础镜像
 FROM registry.cn-hangzhou.aliyuncs.com/megakn1ght-docker/alpine:latest
 
-# 从之前的构建阶段复制构建结果
+# # 从之前的构建阶段复制构建结果
 COPY --from=0 /dst /
 COPY --from=0 /src/Debug/test/dummy.* /tls/
 COPY --from=0 /src/test/interop.sh /bin
 
-# 安装运行所需的软件包
+# # 安装运行所需的软件包
 RUN apk add --no-cache openssl http-parser ethtool
 
 # 设置默认命令以保持容器运行
-CMD ["tail", "-f", "/dev/null"]
+# CMD ["tail", "-f", "/dev/null"]
 
 # 暴露端口（如果需要）
 # EXPOSE 443/UDP
