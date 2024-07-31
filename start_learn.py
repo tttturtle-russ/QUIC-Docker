@@ -1,7 +1,13 @@
 import subprocess
+import argparse
 import os
 import glob
 from concurrent.futures import ThreadPoolExecutor, as_completed
+
+# 设置命令行参数解析
+parser = argparse.ArgumentParser(description="Start multiple Docker containers for QUIC mapping.")
+parser.add_argument("--folder_path", type=str, required=True, help="Path to the folder containing addresses.txt file.")
+args = parser.parse_args()
 
 def run_container(remote_addr):
     remote_container_name, remote_port = remote_addr
@@ -9,9 +15,9 @@ def run_container(remote_addr):
     print(f"Starting {container_name} with remote address {remote_container_name}:{remote_port}...")
     
     # 定义日志文件路径
-    host_log_path = os.path.abspath(f"./logs/{container_name}_info.txt")
-    container_log_path = "/tmp/info.txt"  # 假设容器内部路径为/app
-
+    host_log_path = os.path.abspath(f"./logs/{container_name}_info")
+    container_log_path = "/tmp"  # 假设容器内部路径为/app
+    container_logfile = "/tmp/info.txt"
     # 确保日志目录存在
     os.makedirs(os.path.dirname(host_log_path), exist_ok=True)
 
@@ -22,7 +28,7 @@ def run_container(remote_addr):
         "--network", network_name,
         "-v", f"{host_log_path}:{container_log_path}",
         image_name,
-        "sh", "-c", f"python3 infer_server.py -L {container_name}:10000 -R {remote_container_name}:{remote_port} > {container_log_path} 2>&1"
+        "/bin/bash", "-c", f"python3 infer_server.py -L {container_name}:10000 -R {remote_container_name}:{remote_port} > {container_logfile} 2>&1"
     ])
 
     # 检查容器是否停止并获取退出代码
@@ -30,42 +36,18 @@ def run_container(remote_addr):
     exit_code = result.stdout.strip()
 
     # 定义目标文件夹
-    target_folder = f"./output/quant/{container_name}/"
+    target_folder = f"./log/{container_name}/"
     os.makedirs(target_folder, exist_ok=True)
-
+    subprocess.run(["docker", "cp", f"{container_name}:{container_log_path}", target_folder])
     # 根据退出代码判断任务是否成功完成
     if exit_code == "0":
-        print(f"Container {container_name} finished successfully. Starting to copy files...")
-        # 定义容器内的文件夹
-        source_folder = f"/tmp/quic-infer/"
-        
-        # 从容器复制文件到外部
-        cp_result = subprocess.run(["docker", "cp", f"{container_name}:{source_folder}", target_folder])
-        if cp_result.returncode != 0:
-            print(f"Failed to copy expected files, trying to copy /tmp/pylstar_* directories...")
-            # 查找并复制 /tmp/pylstar_* 目录内容
-            pylstar_dirs = glob.glob(f"/tmp/pylstar_*")
-            for pylstar_dir in pylstar_dirs:
-                dir_name = os.path.basename(pylstar_dir)
-                target_failed_folder = f"./output/quant/{container_name}_failed/{dir_name}"
-                os.makedirs(target_failed_folder, exist_ok=True)
-                subprocess.run(["docker", "cp", f"{container_name}:{pylstar_dir}", target_failed_folder])
-        else:
-            print(f"Files copied to {target_folder}")
+        print(f"Container {container_name} finished successfully. Files are in {host_log_path}")
     else:
-        print(f"Failed to copy expected files, trying to copy /tmp/pylstar_* directories...")
-            # 查找并复制 /tmp/pylstar_* 目录内容
-        pylstar_dirs = glob.glob(f"/tmp/pylstar_*")
-        for pylstar_dir in pylstar_dirs:
-            dir_name = os.path.basename(pylstar_dir)
-            target_failed_folder = f"./output/quant/{container_name}_failed/{dir_name}"
-            os.makedirs(target_failed_folder, exist_ok=True)
-            subprocess.run(["docker", "cp", f"{container_name}:{pylstar_dir}", target_failed_folder])
-        print(f"Container {container_name} exited with code {exit_code}, copying logs...")
-        subprocess.run(["cp", host_log_path, f"{target_folder}/info.txt"])
+        print(f"Container {container_name} finished unsuccessfully. Check logs in {host_log_path}/info.txt")
+
 
     # 清理容器
-    subprocess.run(["docker", "rm", container_name])
+    # subprocess.run(["docker", "rm", container_name])
 
 # 镜像名称和标签
 image_name = "quic-mapper:latest"
@@ -75,7 +57,8 @@ network_name = "quic"
 # subprocess.run(["docker", "network", "create", network_name], check=True)
 
 # 读取remoteaddr列表
-with open("addresses.txt", "r") as file:
+address_file_path = os.path.join(args.folder_path, "addresses.txt")
+with open(address_file_path, "r") as file:
     remote_addresses = file.readlines()
 
 # 清理空白字符并拆分容器名和端口

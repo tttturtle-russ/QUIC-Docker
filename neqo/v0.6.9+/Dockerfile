@@ -1,8 +1,6 @@
 # Stage 1: Build the executable
 FROM ubuntu:18.04 AS builder
 
-ARG BRANCH_NAME
-
 # Install build dependencies
 RUN apt update && apt upgrade -y && \
     apt-get install -y --no-install-recommends \
@@ -16,7 +14,7 @@ RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
 ENV PATH=$PATH:/root/.cargo/bin/
 
 # Clone and build Neqo
-RUN git clone --branch ${BRANCH_NAME} --depth 1 https://github.com/mozilla/neqo.git && \
+RUN git clone --branch v0.6.9 --depth 1 https://github.com/mozilla/neqo.git && \
     git clone https://github.com/nss-dev/nss.git  /neqo/nss && \
     hg clone https://hg.mozilla.org/projects/nspr /neqo/nspr
 WORKDIR /neqo
