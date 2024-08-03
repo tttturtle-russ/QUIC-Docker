@@ -1,0 +1,41 @@
+FROM debian:latest
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends build-essential \
+    git cmake golang make autoconf automake libtool \
+    libevent-dev net-tools python3 && \
+    git config --global http.sslverify false && \
+    git config --global https.sslverify false
+
+RUN mkdir build
+
+COPY ./build.sh /
+
+RUN chmod 777 /build.sh
+
+COPY ./modify_script.py /
+
+RUN git clone https://github.com/alibaba/xquic.git
+
+RUN python3 /modify_script.py
+
+RUN /build.sh
+
+RUN mkdir xquic_bin && \
+    mv xquic/build/demo/demo_server /xquic_bin 
+
+COPY ./server.crt /xquic_bin
+COPY ./server.key /xquic_bin
+
+RUN apt-get -y purge \
+    build-essential git cmake golang make autoconf automake libtool net-tools && \
+    apt-get -y autoremove --purge && \
+    rm -rf /var/log/*
+
+WORKDIR /xquic_bin
+
+EXPOSE 8443
+
+# CMD ["./test_server", "-a", "0.0.0.0", "-p", "4433", "-l", "d"]
+
+
