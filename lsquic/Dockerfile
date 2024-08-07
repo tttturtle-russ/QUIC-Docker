@@ -4,14 +4,15 @@ FROM ubuntu:16.04 AS builder
 ARG BRANCH_NAME
 
 RUN apt-get update && \
-    apt-get install -y build-essential git cmake software-properties-common \
+    apt-get install -y --fix-missing build-essential git cmake software-properties-common \
                        zlib1g-dev libevent-dev
 
 RUN add-apt-repository ppa:gophers/archive && \
     apt-get update && \
-    apt-get install -y golang-1.9-go && \
+    apt-get install -y golang-1.9-go python3 && \
     cp /usr/lib/go-1.9/bin/go* /usr/bin/.
 
+    
 WORKDIR /src
 
 # 克隆lsquic
@@ -19,6 +20,10 @@ RUN mkdir /src/lsquic
 RUN git clone -b ${BRANCH_NAME} --depth 1 https://github.com/litespeedtech/lsquic.git /src/lsquic && \
     cd /src/lsquic && \
     git submodule update --init
+
+COPY ./modify_script.py /
+
+RUN python3 /modify_script.py
 
 # 克隆并编译boringssl
 RUN git clone https://boringssl.googlesource.com/boringssl && \

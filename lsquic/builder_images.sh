@@ -23,3 +23,6 @@ for branch in $branches; do
     # 将容器名:端口格式写入到文件中
     echo "lsquic_$branch:4433" >> addresses.txt
 done
+
+cd ../
+nohup python3 start_learn.py --folder_path lsquic & 
